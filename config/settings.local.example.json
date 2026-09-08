@@ -1,0 +1,34 @@
+{
+  "java": {
+    "path": "C:\\path\\to\\java8\\bin\\java.exe"
+  },
+  "client": {
+    "logsDirectory": "C:\\path\\to\\minecraft\\logs",
+    "modsDirectory": "C:\\path\\to\\minecraft\\mods"
+  },
+  "profiles": {
+    "Normal": {
+      "serverDirectory": "C:\\path\\to\\normal-server",
+      "serverJar": "forge-1.12.2-14.23.5.2864.jar"
+    },
+    "Creative": {
+      "sourceServerDirectory": "C:\\path\\to\\normal-server",
+      "serverJar": "forge-1.12.2-14.23.5.2864.jar",
+      "minecraftServerJar": "minecraft_server.1.12.2.jar"
+    }
+  },
+  "detection": {
+    "primaryOwner": "DC",
+    "primaryPackagePrefixes": ["com.minecraftmoddevelopmentdear.dimensionalcontainer"],
+    "primaryLoggers": ["dimensionalcontainer", "DimensionalContainerCore"]
+  },
+  "github": {
+    "enabled": false,
+    "authMode": "GitHubCli",
+    "ghPath": "C:\\Program Files\\GitHub CLI\\gh.exe",
+    "owner": "",
+    "repository": "",
+    "logLabel": "Log",
+    "externalLabel": "External"
+  }
+}

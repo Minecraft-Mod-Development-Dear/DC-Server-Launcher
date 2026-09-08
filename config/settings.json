@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "java": {
+    "path": "",
+    "arguments": ["-Xms1G", "-Xmx4G"]
+  },
+  "client": {
+    "logsDirectory": "%APPDATA%\\.minecraft\\logs",
+    "modsDirectory": "%APPDATA%\\.minecraft\\mods"
+  },
+  "profiles": {
+    "Normal": {
+      "serverDirectory": "server",
+      "serverJar": "forge-server.jar",
+      "worldNameFromProperties": true,
+      "expectedProperties": {
+        "gamemode": "0",
+        "force-gamemode": "false",
+        "server-ip": "127.0.0.1",
+        "server-port": "25565",
+        "level-type": "DEFAULT"
+      }
+    },
+    "Creative": {
+      "serverDirectory": "runtime\\creative-server",
+      "sourceServerDirectory": "server",
+      "serverJar": "forge-server.jar",
+      "minecraftServerJar": "minecraft_server.1.12.2.jar",
+      "worldName": "creative-debug-world",
+      "expectedProperties": {
+        "gamemode": "1",
+        "force-gamemode": "true",
+        "enable-command-block": "true",
+        "server-ip": "127.0.0.1",
+        "server-port": "25566",
+        "level-name": "creative-debug-world",
+        "level-type": "DEFAULT"
+      }
+    }
+  },
+  "mods": {
+    "validate": true,
+    "clientOnlyModIds": [],
+    "serverOnlyModIds": [],
+    "clientOnlyJarHashes": [],
+    "serverOnlyJarHashes": []
+  },
+  "detection": {
+    "primaryOwner": "DC",
+    "primaryPackagePrefixes": ["com.minecraftmoddevelopmentdear.dimensionalcontainer"],
+    "primaryLoggers": ["dimensionalcontainer", "DimensionalContainerCore"]
+  },
+  "github": {
+    "enabled": false,
+    "authMode": "GitHubCli",
+    "ghPath": "",
+    "apiBase": "https://api.github.com",
+    "owner": "",
+    "repository": "",
+    "logLabel": "Log",
+    "externalLabel": "External",
+    "appId": "",
+    "installationId": "",
+    "privateKeyPath": "",
+    "openSslPath": ""
+  },
+  "posting": {
+    "maxItemBytes": 250000,
+    "maxRunBytes": 1000000,
+    "maxMutations": 20
+  }
+}

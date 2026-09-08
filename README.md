@@ -1,5 +1,3 @@
-# Dimensional Container サポートランチャー
-
 Minecraft Forge 1.12.2で動くDimensional Container（DC）サーバーを起動し、
 停止後のログを確認するWindows用デバッグツールです。GitHub連携を有効にすると、
 検出結果をGitHub Issueへ記録できます。

@@ -92,7 +92,8 @@ function Add-FindingsToOutbox {
     foreach ($checkpoint in $checkpoints) {
         $segment = Read-LogSegment $checkpoint
         foreach ($finding in @(Get-LogFindings $segment ([string]$checkpoint.path) @($Ignore.ignoreContains))) {
-            $ownership = Get-FindingOwnership @($finding.lines) @($detection.packagePrefixes) @($detection.loggers) $detection.owner
+            $ownershipLines = @($finding.lines | Where-Object { -not [string]::IsNullOrEmpty([string]$_) })
+            $ownership = Get-FindingOwnership $ownershipLines @($detection.packagePrefixes) @($detection.loggers) $detection.owner
             $fingerprint = Get-FindingFingerprint $finding.text $ownership.owner
             if ($dedupe.ContainsKey($fingerprint)) { continue }
             $dedupe[$fingerprint] = $true

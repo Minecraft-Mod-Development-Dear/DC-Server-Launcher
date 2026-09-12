@@ -132,7 +132,13 @@ function Get-FileSha256 {
 function Get-FilePrefixHash {
     param([Parameter(Mandatory = $true)][string]$Path, [int]$Length)
     if ($Length -le 0) { return '' }
-    $stream = [IO.File]::Open($Path, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::ReadWrite)
+    $stream = $null
+    try {
+        $share = [IO.FileShare]::ReadWrite -bor [IO.FileShare]::Delete
+        $stream = [IO.File]::Open($Path, [IO.FileMode]::Open, [IO.FileAccess]::Read, $share)
+    } catch [IO.IOException] {
+        return ''
+    }
     $sha = [Security.Cryptography.SHA256]::Create()
     try {
         $buffer = New-Object byte[] $Length
@@ -175,19 +181,34 @@ function Read-LogSegment {
         if ([string]$currentPrefix -cne [string]$Checkpoint.prefixHash) { $offset = 0 }
     }
     if ($offset -lt 0 -or $offset -gt $file.Length) { $offset = 0 }
-    $stream = [IO.File]::Open($path, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::ReadWrite)
+    $stream = $null
     try {
+        try {
+            # Minecraft/Log4j may keep the client log open while the server
+            # finalizes. Share the file with the running client where possible.
+            $share = [IO.FileShare]::ReadWrite -bor [IO.FileShare]::Delete
+            $stream = [IO.File]::Open($path, [IO.FileMode]::Open, [IO.FileAccess]::Read, $share)
+        } catch [IO.IOException] {
+            # A locked client log must not turn an otherwise clean server exit
+            # into a launcher failure. It will be picked up on a later run.
+            return ''
+        }
         [void]$stream.Seek($offset, [IO.SeekOrigin]::Begin)
-        $reader = New-Object IO.StreamReader($stream, (New-Object Text.UTF8Encoding($false, $true)), $true)
-        try { return $reader.ReadToEnd() }
-        catch {
-            $reader.Dispose()
-            $stream.Dispose()
-            $bytes = [IO.File]::ReadAllBytes($path)
-            $count = [int]($bytes.Length - $offset)
-            return [Text.Encoding]::GetEncoding(932).GetString($bytes, [int]$offset, $count)
-        } finally {
-            if ($null -ne $reader) { $reader.Dispose() }
+        $remaining = [int64]$stream.Length - $offset
+        if ($remaining -le 0) { return '' }
+        if ($remaining -gt [int32]::MaxValue) { throw "Log segment is too large to read: $path" }
+        $bytes = New-Object byte[] ([int]$remaining)
+        $read = 0
+        while ($read -lt $bytes.Length) {
+            $count = $stream.Read($bytes, $read, $bytes.Length - $read)
+            if ($count -le 0) { break }
+            $read += $count
+        }
+        if ($read -le 0) { return '' }
+        try {
+            return (New-Object Text.UTF8Encoding($false, $true)).GetString($bytes, 0, $read)
+        } catch {
+            return [Text.Encoding]::GetEncoding(932).GetString($bytes, 0, $read)
         }
     } finally {
         if ($null -ne $stream) { $stream.Dispose() }
